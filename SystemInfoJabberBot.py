@@ -189,10 +189,6 @@ class SystemInfoJabberBot(JabberBot):
                     except IndexError:
                         return usage_add
                 
-                ''' stat '''
-                if argz[0] == 'stat':
-                    return self.__tc.stat()
-                
                 return usage
             
             except KeyError as ke:
@@ -273,7 +269,7 @@ def main():
     logging.basicConfig()
     
     config = RawConfigParser()
-    config.read([os.path.expanduser('~/.config/SystemInfoJabberBot.cfg'),'SystemInfoJabberBot.cfg']) 
+    config.read(['SystemInfoJabberBot.cfg',os.path.expanduser('~/.config/SystemInfoJabberBot.cfg')]) 
     username = config.get('systembot','username')
     password = config.get('systembot','password')
     auth_users_raw= config.get('systembot','auth_users')

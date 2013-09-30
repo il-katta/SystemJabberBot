@@ -6,6 +6,8 @@ Created on 25/ago/2013
 import os,shlex
 from os import getcwd, chdir
 from subprocess import Popen,PIPE
+import cStringIO
+
 class SystemUtils(object):
     __cwd=None
 
@@ -16,22 +18,20 @@ class SystemUtils(object):
     def __execmd(self,cmd):
         args=shlex.split(cmd)
         if '|' in args:
-            i = args.index('|')
+            #i = args.index('|')
+            i = (len(args) - 1) - args[::-1].index('|')
             l = ' '.join(args[:i])
             r = args[i+1:]
-            #print("i: %d \n l: '%s' \n r: '%s' \n" % (i,l,' '.join(r)))
-            #print('args[i]: %s\n'% args[i])
-            return Popen(r,stdin=self.__execmd(l)).stdout
+            return Popen(r, stdin=self.__execmd(l),stdout=PIPE).stdout
         else:
-            out = Popen(args, stdout=PIPE, shell=True).stdout
-            return out
+            return  Popen(args, stdout=PIPE).stdout
 
     def execmd(self,cmd):
         rcwd=getcwd()
         chdir(self.__cwd)
-        ret = self.__execmd(cmd).read()
+        ret = self.__execmd(cmd)
         chdir(rcwd)
-        return ret
+        return ret.read()
 
     def cd(self,path):
         try:
@@ -84,7 +84,3 @@ class SystemUtils(object):
 
         return None
 
-if __name__ == "__main__":
-    su=SystemUtils()
-    out=su.execmd('ps aux | grep bash')
-    print(out);

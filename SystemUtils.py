@@ -14,7 +14,6 @@ class SystemUtils(object):
         self.__cwd=getcwd()
 
     def __execmd(self,cmd):
-        
         args=shlex.split(cmd)
         if '|' in args:
             i=args.index('|')

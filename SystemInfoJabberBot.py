@@ -262,6 +262,8 @@ class SystemInfoJabberBot(JabberBot):
     @botcmd
     def cd(self, mess, cmd):
         ''' unix command to change current working dir '''
+        if cmd is '' :
+            cmd='~'
         self.__sysu.cd( expanduser(cmd) )
         return self.__sysu.pwd()
 

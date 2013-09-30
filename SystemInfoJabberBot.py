@@ -9,7 +9,7 @@ from jabberbot import JabberBot, botcmd
 import jabberbot 
 from ConfigParser import RawConfigParser,NoSectionError,NoOptionError
 from SystemInfo import SystemInfo
-from  TorrentCli import TorrentCli
+
 from SystemUtils import SystemUtils
 import logging, datetime, os, shlex
 
@@ -18,13 +18,20 @@ class SystemInfoJabberBot(JabberBot):
     sysinfo=None
     __tc=None
     __logs=None
+    __sysutils=None
     def __init__(self, username, password,auth_users):
         jabberbot.JabberBot.__init__(self, username, password)
         self.auth_users=auth_users
         self.sysinfo = SystemInfo()
+        self.__sysu= SystemUtils()
     
     def setTransmissionConfig(self,host,port=9091,user=None,psw=None):
-        self.__tc = TorrentCli(host,port,user,psw)
+        try:
+            from  TorrentCli import TorrentCli
+            self.__tc = TorrentCli(host,port,user,psw)
+            return self.__tc != None
+        except:
+            return False
     
     def setLogFiles(self,log_files):
         self.__logs=log_files
@@ -93,11 +100,19 @@ class SystemInfoJabberBot(JabberBot):
     def helo(self,mess,args):
         """ Display script info """
         return self.hello(mess,args)
-    
+
+    @botcmd
+    def which(self,mess,args):
+        ''' UNIX which command '''
+        path=SystemUtils.which(args[0])
+        if path is None:
+            return "command not found"
+        else:
+            return "%s : %s" % (args[0],path)
+
     @botcmd
     def torrent(self,mess,args):
         """ torrent client """
-        
         usage_remove="usage: torrent remove < #torrent | complete | all > \n\ttorrent remove  data < #torrent > "
         usage_add="usage: torrent add < URL | magnet >"
         usage_start="usage: torrent start < all | #torrent > [ force ]"
@@ -243,7 +258,19 @@ class SystemInfoJabberBot(JabberBot):
         if self.status_message != status:
             self.status_message = status
         return
-    
+
+    def unknown_command(self, mess, cmd, args):
+        path=SystemUtils.which(cmd)
+        if path is not None:
+            if cmd is 'cd':
+                self.__sysu.cd( ' '.join(args[1:]) )
+                return ''
+            if cmd is 'pwd':
+                return self.__sysu.pwd()
+            return self.__sysu.exec(str(mess.getBody()))
+        else:
+            return None
+
     @botcmd
     def load(self, mess, args):
         """ system load """
@@ -280,7 +307,7 @@ def main():
     bot = SystemInfoJabberBot(username,password,auth_users)
     
     # Transmission config
-    try:
+    if config.has_section('transmissionrpc'):
         host = config.get('transmissionrpc','host')
         port = config.getint('transmissionrpc','port')
         try:
@@ -289,8 +316,6 @@ def main():
             bot.setTransmissionConfig(host,port=port,user=user,psw=psw)
         except NoOptionError:
             bot.setTransmissionConfig(host,port=port)
-    except NoSectionError:
-        pass
     
     if config.has_section('logs'):
         log_files=config.items('logs')
@@ -305,14 +330,13 @@ def main():
         pass
 
 if __name__ == "__main__":
-    while True:
-        try:
-            main()
-        except KeyboardInterrupt as q:
-            print "Exception occurred < %s : %s >" % (type(q), q.message )
-            print "Shutting down"
-            exit(0)
-        except Exception as e:
-            print "Exception occurred < %s : %s >" % (type(e), e.message )
-            print "Restarting server"
-            pass
+    try:
+        print "start server"
+        main()
+    except KeyboardInterrupt as q:
+        print "Exception occurred < %s : %s >" % (type(q), q.message )
+        print "Shutting down"
+        exit(0)
+    except Exception as e:
+        print "Exception occurred < %s : %s >" % (type(e), e.message )
+        pass

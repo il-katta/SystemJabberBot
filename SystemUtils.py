@@ -5,7 +5,7 @@ Created on 25/ago/2013
 '''
 import os,shlex
 from os import getcwd, chdir
-from subprocess import Popen
+from subprocess import Popen,PIPE
 class SystemUtils(object):
     __cwd=None
 
@@ -13,13 +13,26 @@ class SystemUtils(object):
     def __init__(self):
         self.__cwd=getcwd()
 
-    def exec(self,cmd):
+    def __execmd(self,cmd):
+        
+        args=shlex.split(cmd)
+        if '|' in args:
+            i=args.index('|')
+            l=' '.join(args[:i])
+            r=args[i+1:]
+            print("i: %d \n l: '%s' \n r: '%s' \n" % (i,l,' '.join(r)))
+            print('args[i]: %s\n'% args[i])
+            return Popen(r,stdin=self.__execmd(l)).stdout
+        else:
+            out = Popen(args, stdout=PIPE, shell=True).stdout
+            return out
+
+    def execmd(self,cmd):
         rcwd=getcwd()
         chdir(self.__cwd)
-        args=shlex.split(cmd)
-        out = Popen(args, stdout=PIPE, shell=True).stdout.read()
+        ret = self.__execmd(cmd).read()
         chdir(rcwd)
-        return out
+        return ret
 
     def cd(self,path):
         try:
@@ -71,3 +84,8 @@ class SystemUtils(object):
                     return exe_file
 
         return None
+
+if __name__ == "__main__":
+    su=SystemUtils()
+    out=su.execmd('ps aux | grep bash')
+    print(out);

@@ -267,7 +267,7 @@ class SystemInfoJabberBot(JabberBot):
                 return ''
             if cmd is 'pwd':
                 return self.__sysu.pwd()
-            return self.__sysu.exec(str(mess.getBody()))
+            return self.__sysu.execmd(str(mess.getBody()))
         else:
             return None
 

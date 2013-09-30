@@ -16,11 +16,11 @@ class SystemUtils(object):
     def __execmd(self,cmd):
         args=shlex.split(cmd)
         if '|' in args:
-            i=args.index('|')
-            l=' '.join(args[:i])
-            r=args[i+1:]
-            print("i: %d \n l: '%s' \n r: '%s' \n" % (i,l,' '.join(r)))
-            print('args[i]: %s\n'% args[i])
+            i = args.index('|')
+            l = ' '.join(args[:i])
+            r = args[i+1:]
+            #print("i: %d \n l: '%s' \n r: '%s' \n" % (i,l,' '.join(r)))
+            #print('args[i]: %s\n'% args[i])
             return Popen(r,stdin=self.__execmd(l)).stdout
         else:
             out = Popen(args, stdout=PIPE, shell=True).stdout

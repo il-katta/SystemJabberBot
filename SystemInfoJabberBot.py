@@ -9,9 +9,9 @@ from jabberbot import JabberBot, botcmd
 import jabberbot 
 from ConfigParser import RawConfigParser,NoSectionError,NoOptionError
 from SystemInfo import SystemInfo
-
 from SystemUtils import SystemUtils
 import logging, datetime, os, shlex
+from os.path import expanduser
 
 class SystemInfoJabberBot(JabberBot):
     auth_users=[]
@@ -104,11 +104,11 @@ class SystemInfoJabberBot(JabberBot):
     @botcmd
     def which(self,mess,args):
         ''' UNIX which command '''
-        path=SystemUtils.which(args[0])
+        path=SystemUtils.which(args)
         if path is None:
             return "command not found"
         else:
-            return "%s : %s" % (args[0],path)
+            return "%s : %s" % (args,path)
 
     @botcmd
     def torrent(self,mess,args):
@@ -259,14 +259,21 @@ class SystemInfoJabberBot(JabberBot):
             self.status_message = status
         return
 
+    @botcmd
+    def cd(self, mess, cmd):
+        ''' unix command to change current working dir '''
+        self.__sysu.cd( expanduser(cmd) )
+        return self.__sysu.pwd()
+
+    @botcmd
+    def pwd(self, mess, cmd):
+        ''' return currend working dir '''
+        return self.__sysu.pwd()
+
+
     def unknown_command(self, mess, cmd, args):
         path=SystemUtils.which(cmd)
         if path is not None:
-            if cmd is 'cd':
-                self.__sysu.cd( ' '.join(args[1:]) )
-                return ''
-            if cmd is 'pwd':
-                return self.__sysu.pwd()
             return self.__sysu.execmd(str(mess.getBody()))
         else:
             return None
@@ -330,13 +337,14 @@ def main():
         pass
 
 if __name__ == "__main__":
-    try:
-        print "start server"
-        main()
-    except KeyboardInterrupt as q:
-        print "Exception occurred < %s : %s >" % (type(q), q.message )
-        print "Shutting down"
-        exit(0)
-    except Exception as e:
-        print "Exception occurred < %s : %s >" % (type(e), e.message )
-        pass
+    while True:
+        try:
+            print "start server"
+            main()
+        except KeyboardInterrupt as q:
+            print "Exception occurred < %s : %s >" % (type(q), q.message )
+            print "Shutting down"
+            exit(0)
+        except Exception as e:
+            print "Exception occurred < %s : %s >" % (type(e), e.message )
+            pass

@@ -119,9 +119,10 @@ class SystemInfoJabberBot(JabberBot):
         usage_verify="usage: torrent verify < all | #torrent > [ force ]"
         usage_stop="usage: torrent stop < all | #torrent >"
         usage_list="usage: torrent list [< complete | #idtorrent >]"
-        #usage="usage: torrent < add | list | remove > [..] "
         usage="usage:\n\t%s \n\t%s \n\t%s \n\t%s \n\t%s" % ( usage_remove , usage_add , usage_verify , usage_stop , usage_list )
-        if self.__tc != None:
+        if not len(args) > 0:
+            return usage
+        if self.__tc != None :
             try:
                 argz = self.__splitstr(args)
                 

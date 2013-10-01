@@ -3,7 +3,7 @@ Created on 25/ago/2013
 
 @author: katta
 '''
-import os,
+import os
 from shlex import split
 from os import getcwd, chdir
 from subprocess import Popen,PIPE

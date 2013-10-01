@@ -10,7 +10,7 @@ import jabberbot
 from ConfigParser import RawConfigParser,NoSectionError,NoOptionError
 from SystemInfo import SystemInfo
 from SystemUtils import SystemUtils
-import logging, datetime, os, shlex
+import logging, datetime, shlex
 from os.path import expanduser
 
 class SystemInfoJabberBot(JabberBot):
@@ -105,10 +105,10 @@ class SystemInfoJabberBot(JabberBot):
     def which(self,mess,args):
         ''' UNIX which command '''
         path=SystemUtils.which(args)
-        if path is None:
-            return "command not found"
-        else:
+        if path:
             return "%s : %s" % (args,path)
+        else:
+            return "%s : command not found" % args
 
     @botcmd
     def torrent(self,mess,args):
@@ -304,9 +304,8 @@ class SystemInfoJabberBot(JabberBot):
 def main():
     print "reading configuration"
     logging.basicConfig()
-    
     config = RawConfigParser()
-    config.read(['SystemInfoJabberBot.cfg',os.path.expanduser('~/.config/SystemInfoJabberBot.cfg')]) 
+    config.read(['SystemInfoJabberBot.cfg',expanduser('~/.config/SystemInfoJabberBot.cfg')]) 
     username = config.get('systembot','username')
     password = config.get('systembot','password')
     auth_users_raw= config.get('systembot','auth_users')

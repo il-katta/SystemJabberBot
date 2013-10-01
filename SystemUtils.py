@@ -3,7 +3,8 @@ Created on 25/ago/2013
 
 @author: katta
 '''
-import os,shlex
+import os,
+from shlex import split
 from os import getcwd, chdir
 from subprocess import Popen,PIPE
 import cStringIO
@@ -11,17 +12,20 @@ import cStringIO
 class SystemUtils(object):
     __cwd=None
 
-
     def __init__(self):
         self.__cwd=getcwd()
 
     def __execmd(self,cmd):
-        args=shlex.split(cmd)
-        if '|' in args:
+        def split_cmd(pcmd):
             #i = args.index('|')
             i = (len(args) - 1) - args[::-1].index('|')
             l = ' '.join(args[:i])
             r = args[i+1:]
+            return l,r
+
+        args=split(cmd)
+        if '|' in args:
+            l , r = slit_cmd(args)            
             return Popen(r, stdin=self.__execmd(l),stdout=PIPE).stdout
         else:
             return  Popen(args, stdout=PIPE).stdout
@@ -81,6 +85,5 @@ class SystemUtils(object):
                 exe_file = os.path.join(path, program)
                 if is_exe(exe_file):
                     return exe_file
-
         return None
 

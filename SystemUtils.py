@@ -16,7 +16,7 @@ class SystemUtils(object):
         self.__cwd=getcwd()
 
     def __execmd(self,cmd):
-        def split_cmd(pcmd):
+        def split_cmd_pipe(pcmd):
             #i = args.index('|')
             i = (len(args) - 1) - args[::-1].index('|')
             l = ' '.join(args[:i])
@@ -25,7 +25,7 @@ class SystemUtils(object):
 
         args=split(cmd)
         if '|' in args:
-            l , r = slit_cmd(args)            
+            l , r = slit_cmd_pipe(args)            
             return Popen(r, stdin=self.__execmd(l),stdout=PIPE).stdout
         else:
             return  Popen(args, stdout=PIPE).stdout

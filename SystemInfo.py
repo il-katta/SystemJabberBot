@@ -70,7 +70,8 @@ class SystemInfo(object):
         return who
     
     def df(self):
-        with os.popen('/usr/bin/df -h','r') as df_p:
+        dfpath=SystemUtils.which('df')
+        with os.popen('%s -h' % dfpath,'r') as df_p:
             return df_p.read()
 
     

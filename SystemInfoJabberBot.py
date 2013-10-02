@@ -243,10 +243,10 @@ class SystemInfoJabberBot(JabberBot):
         """Display who's currently logged in."""
         return self.sysinfo.who()
     
-    @botcmd
-    def df(self, mess, args):
-        """report file system disk space usage"""
-        return self.sysinfo.df()
+#    @botcmd
+#    def df(self, mess, args):
+#        """report file system disk space usage"""
+#        return self.sysinfo.df()
 
     def idle_proc(self):
         status = []
